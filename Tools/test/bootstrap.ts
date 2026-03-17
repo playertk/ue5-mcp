@@ -9,6 +9,24 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+
+const envPath = path.resolve(import.meta.dirname, "..", ".env");
+if (fs.existsSync(envPath)) {
+  const content = fs.readFileSync(envPath, "utf-8");
+  for (const line of content.split("\n")) {
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith("#")) {
+      const eqIdx = trimmed.indexOf("=");
+      if (eqIdx > 0) {
+        const key = trimmed.slice(0, eqIdx).trim();
+        const value = trimmed.slice(eqIdx + 1).trim();
+        if (key && !process.env[key]) {
+          process.env[key] = value;
+        }
+      }
+    }
+  }
+}
 import * as os from "node:os";
 import { execSync, spawn, type ChildProcess } from "node:child_process";
 
